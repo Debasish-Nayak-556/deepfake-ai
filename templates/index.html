@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DeepFake AI Studio</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ═══ SCANLINE OVERLAY ═══ -->
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <!-- ═══ PARTICLE CANVAS ═══ -->
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+  <!-- ═══ HEADER ═══ -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-bracket">[</span>
+        <span class="logo-text">DEEP<span class="neon-accent">FAKE</span></span>
+        <span class="logo-bracket">]</span>
+        <span class="logo-sub">AI STUDIO</span>
+      </div>
+
+      <nav class="nav-tabs">
+        <button class="nav-btn active" data-tab="image">
+          <span class="nav-icon">◈</span> Image Swap
+        </button>
+        <button class="nav-btn" data-tab="video">
+          <span class="nav-icon">◉</span> Video Swap
+        </button>
+        <button class="nav-btn" data-tab="detect">
+          <span class="nav-icon">◎</span> Detect
+        </button>
+      </nav>
+
+      <div class="header-controls">
+        <div class="status-dot" id="serverStatus" title="Server Status"></div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <span class="theme-icon">◐</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══ MAIN ═══ -->
+  <main class="main">
+
+    <!-- ────── IMAGE SWAP TAB ────── -->
+    <section class="tab-panel active" id="tab-image">
+      <div class="panel-header">
+        <h2 class="panel-title">FACE SWAP <span class="chip">IMAGE</span></h2>
+        <p class="panel-desc">Upload a source face and a target image to perform AI-powered face substitution.</p>
+      </div>
+
+      <div class="upload-grid">
+        <!-- Source -->
+        <div class="upload-card" id="sourceCard">
+          <div class="upload-label">
+            <span class="label-dot"></span> SOURCE FACE
+          </div>
+          <div class="drop-zone" id="sourceZone" data-target="sourceFile">
+            <div class="drop-icon">↑</div>
+            <div class="drop-text">Drop image or <span class="link-text">browse</span></div>
+            <div class="drop-hint">PNG · JPG · WEBP — Max 50MB</div>
+            <img class="preview-img hidden" id="sourcePreview" alt="Source preview" />
+          </div>
+          <input type="file" id="sourceFile" accept="image/*" class="file-input" />
+        </div>
+
+        <!-- Arrow -->
+        <div class="swap-arrow">
+          <div class="arrow-glow">⟶</div>
+          <div class="arrow-label">SWAP</div>
+        </div>
+
+        <!-- Target -->
+        <div class="upload-card" id="targetCard">
+          <div class="upload-label">
+            <span class="label-dot" style="--dot-color: var(--neon-pink)"></span> TARGET IMAGE
+          </div>
+          <div class="drop-zone" id="targetZone" data-target="targetFile">
+            <div class="drop-icon">↑</div>
+            <div class="drop-text">Drop image or <span class="link-text">browse</span></div>
+            <div class="drop-hint">PNG · JPG · WEBP — Max 50MB</div>
+            <img class="preview-img hidden" id="targetPreview" alt="Target preview" />
+          </div>
+          <input type="file" id="targetFile" accept="image/*" class="file-input" />
+        </div>
+      </div>
+
+      <!-- Options -->
+      <div class="options-bar">
+        <div class="option-group">
+          <label class="option-label">ENHANCE</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="enhanceToggle" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="option-group">
+          <label class="option-label">BLEND STRENGTH</label>
+          <div class="slider-wrap">
+            <input type="range" id="blendSlider" min="0" max="100" value="85" class="range-slider" />
+            <span class="range-val" id="blendVal">85%</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="action-btn" id="swapImageBtn">
+        <span class="btn-glow"></span>
+        <span class="btn-text">⚡ EXECUTE SWAP</span>
+      </button>
+
+      <!-- Result -->
+      <div class="result-panel hidden" id="imageResult">
+        <div class="result-header">OUTPUT <span class="chip chip-green">COMPLETE</span></div>
+        <div class="result-body">
+          <img id="resultImg" class="result-img" alt="Result" />
+          <div class="result-meta" id="imageMeta"></div>
+        </div>
+        <a class="download-btn" id="imageDownload" download>⬇ DOWNLOAD RESULT</a>
+      </div>
+    </section>
+
+    <!-- ────── VIDEO SWAP TAB ────── -->
+    <section class="tab-panel" id="tab-video">
+      <div class="panel-header">
+        <h2 class="panel-title">FACE SWAP <span class="chip chip-pink">VIDEO</span></h2>
+        <p class="panel-desc">Swap a face from a still image onto a video clip frame-by-frame.</p>
+      </div>
+
+      <div class="upload-grid">
+        <div class="upload-card">
+          <div class="upload-label"><span class="label-dot"></span> SOURCE FACE</div>
+          <div class="drop-zone" id="vSourceZone" data-target="vSourceFile">
+            <div class="drop-icon">↑</div>
+            <div class="drop-text">Drop image or <span class="link-text">browse</span></div>
+            <img class="preview-img hidden" id="vSourcePreview" alt="" />
+          </div>
+          <input type="file" id="vSourceFile" accept="image/*" class="file-input" />
+        </div>
+
+        <div class="swap-arrow">
+          <div class="arrow-glow">⟶</div>
+          <div class="arrow-label">SWAP</div>
+        </div>
+
+        <div class="upload-card">
+          <div class="upload-label"><span class="label-dot" style="--dot-color: var(--neon-pink)"></span> TARGET VIDEO</div>
+          <div class="drop-zone" id="vTargetZone" data-target="vTargetFile">
+            <div class="drop-icon">▶</div>
+            <div class="drop-text">Drop video or <span class="link-text">browse</span></div>
+            <div class="drop-hint">MP4 · MOV · AVI — Max 50MB</div>
+            <video class="preview-img hidden" id="vTargetPreview" controls muted></video>
+          </div>
+          <input type="file" id="vTargetFile" accept="video/*" class="file-input" />
+        </div>
+      </div>
+
+      <div class="options-bar">
+        <div class="option-group">
+          <label class="option-label">FRAME SKIP</label>
+          <div class="slider-wrap">
+            <input type="range" id="frameSkip" min="0" max="5" value="0" class="range-slider" />
+            <span class="range-val" id="frameSkipVal">0</span>
+          </div>
+        </div>
+        <div class="option-group">
+          <label class="option-label">MAX FRAMES</label>
+          <div class="slider-wrap">
+            <input type="range" id="maxFrames" min="50" max="500" value="200" step="10" class="range-slider" />
+            <span class="range-val" id="maxFramesVal">200</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="action-btn" id="swapVideoBtn">
+        <span class="btn-glow"></span>
+        <span class="btn-text">⚡ PROCESS VIDEO</span>
+      </button>
+
+      <div class="result-panel hidden" id="videoResult">
+        <div class="result-header">OUTPUT <span class="chip chip-green">COMPLETE</span></div>
+        <div class="result-body">
+          <video id="resultVideo" class="result-img" controls muted></video>
+          <div class="result-meta" id="videoMeta"></div>
+        </div>
+        <a class="download-btn" id="videoDownload" download>⬇ DOWNLOAD VIDEO</a>
+      </div>
+    </section>
+
+    <!-- ────── DETECT TAB ────── -->
+    <section class="tab-panel" id="tab-detect">
+      <div class="panel-header">
+        <h2 class="panel-title">FACE <span class="chip chip-cyan">DETECT</span></h2>
+        <p class="panel-desc">Analyse an image and detect all faces with bounding box coordinates.</p>
+      </div>
+
+      <div class="upload-grid single">
+        <div class="upload-card wide">
+          <div class="upload-label"><span class="label-dot" style="--dot-color: var(--neon-cyan)"></span> ANALYSE IMAGE</div>
+          <div class="drop-zone" id="detectZone" data-target="detectFile">
+            <div class="drop-icon">◎</div>
+            <div class="drop-text">Drop image or <span class="link-text">browse</span></div>
+            <img class="preview-img hidden" id="detectPreview" alt="" />
+          </div>
+          <input type="file" id="detectFile" accept="image/*" class="file-input" />
+        </div>
+      </div>
+
+      <button class="action-btn action-btn--cyan" id="detectBtn">
+        <span class="btn-glow"></span>
+        <span class="btn-text">◎ SCAN FOR FACES</span>
+      </button>
+
+      <div class="result-panel hidden" id="detectResult">
+        <div class="result-header">SCAN RESULT <span class="chip chip-cyan" id="faceCountChip">0 FACES</span></div>
+        <div id="detectMeta" class="detect-table-wrap"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══ PROGRESS OVERLAY ═══ -->
+  <div class="progress-overlay hidden" id="progressOverlay">
+    <div class="progress-box">
+      <div class="progress-title" id="progressTitle">PROCESSING...</div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div class="progress-label" id="progressLabel">Initialising AI engine...</div>
+      <div class="progress-cancel" id="progressCancel">CANCEL</div>
+    </div>
+  </div>
+
+  <!-- ═══ TOAST ═══ -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="footer">
+    <span>DeepFake AI Studio</span>
+    <span class="sep">·</span>
+    <span>Built with Python + OpenCV + Flask</span>
+    <span class="sep">·</span>
+    <span id="footerStatus">Connecting...</span>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
