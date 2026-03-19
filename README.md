@@ -56,7 +56,7 @@ deepfake-ai/
 
 ### Step 1 — Clone the repository
 ```bash
-git clone https://github.com/YOURUSERNAME/deepfake-ai.git
+git clone https://github.com/Debasish-Nayak-556/deepfake-ai.git
 cd deepfake-ai
 ```
 
@@ -163,7 +163,7 @@ using someone's likeness.
 
 Made with ❤️ by **Your Name**
 
-[![GitHub](https://img.shields.io/badge/GitHub-YourUsername-black)](https://github.com/YOURUSERNAME)
+[![GitHub](https://img.shields.io/badge/GitHub-Debasish-Nayak-556-black)](https://github.com/Debasish-Nayak-556)
 
 ---
 
