@@ -161,7 +161,7 @@ using someone's likeness.
 
 ## 👨‍💻 Author
 
-Made with ❤️ by **Your Name**
+Made with ❤️ by **Debasish Nayak**
 
 [![GitHub](https://img.shields.io/badge/GitHub-Debasish-Nayak-556-black)](https://github.com/Debasish-Nayak-556)
 
